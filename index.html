@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI SMART вЂ“ РњРЈР›Р¬РўР-РџРђР Рђ v6</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --gold:#FFD700;--gold-dim:#B8860B;
+    --green:#00ffaa;--red:#ff3355;
+    --bg:#050508;--bg2:#0a0a10;--panel:#0d0d16;--border:#1a1a2e;
+    --text:#c8d0e0;--text-dim:#5a6070;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::before{content:'';position:fixed;inset:0;
+    background-image:linear-gradient(rgba(255,215,0,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,215,0,.03) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0;animation:gridMove 20s linear infinite;}
+  @keyframes gridMove{0%{background-position:0 0}100%{background-position:40px 40px}}
+  body::after{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;
+    background:radial-gradient(ellipse at 30% 20%,rgba(255,215,0,.04) 0%,transparent 50%),
+               radial-gradient(ellipse at 70% 80%,rgba(0,255,170,.03) 0%,transparent 50%);
+    pointer-events:none;z-index:0;animation:glowPulse 8s ease-in-out infinite alternate;}
+  @keyframes glowPulse{0%{opacity:.5}100%{opacity:1}}
+
+  .container{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:14px 12px 40px;}
+
+  /* HEADER */
+  .header{text-align:center;padding:20px 0 14px;}
+  .header-line{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:5px;}
+  .header-icon{width:42px;height:42px;background:linear-gradient(135deg,#FFD700,#B8860B);border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:20px;
+    box-shadow:0 0 20px rgba(255,215,0,.4);animation:iconPulse 3s ease-in-out infinite;}
+  @keyframes iconPulse{0%,100%{box-shadow:0 0 20px rgba(255,215,0,.4)}50%{box-shadow:0 0 40px rgba(255,215,0,.7)}}
+  .bot-name{font-family:'Orbitron',monospace;font-size:30px;font-weight:900;
+    background:linear-gradient(135deg,#FFD700 0%,#FFF8DC 50%,#B8860B 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;letter-spacing:4px;}
+  .version-tag{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gold-dim);letter-spacing:3px;}
+
+  /* PRICE BLOCK */
+  .price-block{background:var(--panel);border:1px solid var(--border);border-top:2px solid var(--gold-dim);
+    border-radius:12px;padding:14px 18px;margin-bottom:10px;position:relative;overflow:hidden;}
+  .price-block::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);animation:scanline 4s linear infinite;}
+  @keyframes scanline{0%{opacity:0;transform:translateX(-100%)}50%{opacity:1}100%{opacity:0;transform:translateX(100%)}}
+  .price-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .pair-label{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--gold);letter-spacing:3px;}
+  .live-badge{display:flex;align-items:center;gap:5px;background:rgba(0,255,170,.08);
+    border:1px solid rgba(0,255,170,.2);border-radius:20px;padding:2px 9px;
+    font-size:10px;font-family:'Share Tech Mono',monospace;color:var(--green);letter-spacing:1px;}
+  .live-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:blink 1s ease-in-out infinite;}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+  .lat-info{font-size:9px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+  .lat-val{color:var(--green);}
+  .price-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .price-main{font-family:'Orbitron',monospace;font-size:38px;font-weight:900;color:#fff;
+    letter-spacing:2px;transition:color .15s;}
+  .price-main.up{color:var(--green);text-shadow:0 0 20px rgba(0,255,170,.3);}
+  .price-main.down{color:var(--red);text-shadow:0 0 20px rgba(255,51,85,.3);}
+  .price-change{font-family:'Share Tech Mono',monospace;font-size:12px;padding:2px 7px;border-radius:4px;}
+  .price-change.up{background:rgba(0,255,170,.1);color:var(--green);border:1px solid rgba(0,255,170,.2);}
+  .price-change.down{background:rgba(255,51,85,.1);color:var(--red);border:1px solid rgba(255,51,85,.2);}
+  .price-src{font-size:9px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;margin-top:3px;}
+  .price-meta{display:flex;gap:14px;margin-top:8px;flex-wrap:wrap;}
+  .meta-item{display:flex;flex-direction:column;gap:1px;}
+  .meta-label{font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;font-family:'Share Tech Mono',monospace;}
+  .meta-value{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text);}
+
+  /* CONN STATUS */
+  .conn-row{display:flex;align-items:center;gap:6px;background:rgba(255,215,0,.04);
+    border:1px solid rgba(255,215,0,.1);border-radius:7px;padding:6px 11px;margin-bottom:10px;
+    font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--text-dim);flex-wrap:wrap;gap:8px;}
+  .conn-row.ok{border-color:rgba(0,255,170,.2);}
+  .conn-row.err{border-color:rgba(255,51,85,.2);}
+  .conn-src{padding:1px 6px;border-radius:3px;font-size:9px;letter-spacing:.5px;}
+  .conn-src.live{background:rgba(0,255,170,.1);color:var(--green);border:1px solid rgba(0,255,170,.2);}
+  .conn-src.try{background:rgba(255,215,0,.08);color:var(--gold);border:1px solid rgba(255,215,0,.15);}
+  .conn-src.err{background:rgba(255,51,85,.08);color:var(--red);border:1px solid rgba(255,51,85,.15);}
+
+  /* CHART */
+  .chart-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:11px;margin-bottom:10px;}
+  .chart-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+  .chart-label{font-size:10px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+  .tf-badge{background:rgba(255,215,0,.1);border:1px solid rgba(255,215,0,.2);border-radius:4px;
+    padding:2px 7px;font-size:9px;font-family:'Share Tech Mono',monospace;color:var(--gold);letter-spacing:1px;}
+  canvas#miniChart{width:100%;height:85px;display:block;border-radius:5px;}
+
+  /* INDICATORS */
+  .indicators-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
+  .ind-card{background:var(--panel);border:1px solid var(--border);border-radius:9px;
+    padding:10px 12px;position:relative;overflow:hidden;transition:border-color .3s;}
+  .ind-card.active-bull{border-color:rgba(0,255,170,.3);}
+  .ind-card.active-bear{border-color:rgba(255,51,85,.3);}
+  .ind-name{font-size:9px;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;
+    font-family:'Share Tech Mono',monospace;margin-bottom:4px;}
+  .ind-value{font-family:'Orbitron',monospace;font-size:15px;font-weight:700;color:var(--text);
+    margin-bottom:2px;transition:color .3s;}
+  .ind-value.bull{color:var(--green);}
+  .ind-value.bear{color:var(--red);}
+  .ind-value.neutral{color:var(--gold);}
+  .ind-signal{font-size:10px;font-family:'Share Tech Mono',monospace;letter-spacing:.5px;}
+  .ind-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border);overflow:hidden;}
+  .ind-bar-fill{height:100%;width:50%;background:var(--gold-dim);transition:width .5s ease,background .3s;border-radius:2px;}
+
+  /* BUTTON */
+  .analyze-btn{width:100%;padding:16px;background:linear-gradient(135deg,#1a1a00,#2a2a00);
+    border:1px solid var(--gold-dim);border-radius:11px;color:var(--gold);font-family:'Orbitron',monospace;
+    font-size:13px;font-weight:700;letter-spacing:4px;cursor:pointer;position:relative;overflow:hidden;
+    transition:all .3s;text-transform:uppercase;margin-bottom:10px;}
+  .analyze-btn:hover{border-color:var(--gold);box-shadow:0 0 28px rgba(255,215,0,.2);transform:translateY(-1px);}
+  .analyze-btn:active{transform:translateY(0);}
+  .analyze-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+  .btn-shimmer{position:absolute;top:0;left:-100%;width:100%;height:100%;
+    background:linear-gradient(90deg,transparent,rgba(255,215,0,.15),transparent);
+    animation:shimmer 3s linear infinite;}
+  @keyframes shimmer{0%{left:-100%}100%{left:100%}}
+
+  /* SIGNAL PANEL */
+  .signal-panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;
+    padding:16px;min-height:100px;display:flex;flex-direction:column;justify-content:center;
+    align-items:center;text-align:center;transition:border-color .5s,background .5s;
+    position:relative;overflow:hidden;margin-bottom:10px;}
+  .signal-panel.buy-signal{border-color:rgba(0,255,170,.4);background:linear-gradient(135deg,rgba(0,255,170,.05),var(--panel));}
+  .signal-panel.sell-signal{border-color:rgba(255,51,85,.4);background:linear-gradient(135deg,rgba(255,51,85,.05),var(--panel));}
+  .signal-idle{color:var(--text-dim);font-size:11px;font-family:'Share Tech Mono',monospace;letter-spacing:1px;}
+  .signal-main{display:none;flex-direction:column;align-items:center;gap:9px;width:100%;}
+  .signal-badge{font-family:'Orbitron',monospace;font-size:32px;font-weight:900;letter-spacing:5px;padding:7px 20px;border-radius:8px;}
+  .signal-badge.buy{color:var(--green);background:rgba(0,255,170,.08);border:2px solid rgba(0,255,170,.3);
+    text-shadow:0 0 30px rgba(0,255,170,.5);animation:buyGlow 2s ease-in-out infinite alternate;}
+  .signal-badge.sell{color:var(--red);background:rgba(255,51,85,.08);border:2px solid rgba(255,51,85,.3);
+    text-shadow:0 0 30px rgba(255,51,85,.5);animation:sellGlow 2s ease-in-out infinite alternate;}
+  @keyframes buyGlow{from{box-shadow:0 0 20px rgba(0,255,170,.1)}to{box-shadow:0 0 50px rgba(0,255,170,.25)}}
+  @keyframes sellGlow{from{box-shadow:0 0 20px rgba(255,51,85,.1)}to{box-shadow:0 0 50px rgba(255,51,85,.25)}}
+  .signal-details{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;}
+  .sig-item{display:flex;flex-direction:column;align-items:center;gap:1px;min-width:65px;}
+  .sig-lbl{font-size:8px;color:var(--text-dim);font-family:'Share Tech Mono',monospace;letter-spacing:1px;text-transform:uppercase;}
+  .sig-val{font-family:'Share Tech Mono',monospace;font-size:12px;}
+  .sig-val.green{color:var(--green);}
+  .sig-val.red{color:var(--red);}
+  .sig-val.gold{color:var(--gold);}
+  .signal-reason{font-size:10px;color:var(--text-dim);font-family:'Rajdhani',sans-serif;max-width:460px;line-height:1.5;}
+
+  /* COND LIST */
+  .cond-list{background:var(--bg2);border:1px solid var(--border);border-radius:10px;
+    padding:11px 13px;margin-bottom:10px;display:none;}
+  .cond-title{font-family:'Orbitron',monospace;font-size:8px;color:var(--gold);letter-spacing:2px;margin-bottom:7px;}
+  .cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px;}
+  .cond-row{display:flex;justify-content:space-between;align-items:center;
+    padding:3px 4px;border-radius:4px;font-size:9px;}
+  .cond-name{color:var(--text-dim);font-family:'Share Tech Mono',monospace;}
+  .cond-val{font-family:'Share Tech Mono',monospace;font-weight:700;padding:1px 6px;border-radius:3px;font-size:8px;}
+  .cond-val.ok{color:var(--green);background:rgba(0,255,170,.08);border:1px solid rgba(0,255,170,.15);}
+  .cond-val.no{color:var(--red);background:rgba(255,51,85,.08);border:1px solid rgba(255,51,85,.15);}
+  .cond-val.neu{color:var(--gold);background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.12);}
+
+  /* PROGRESS */
+  .analysis-progress{display:none;flex-direction:column;gap:8px;width:100%;align-items:center;}
+  .progress-label{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--gold);letter-spacing:2px;}
+  .progress-bar-wrap{width:100%;height:3px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .progress-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--gold-dim),var(--gold));border-radius:2px;transition:width .3s ease;}
+  .progress-steps{display:flex;flex-direction:column;gap:3px;width:100%;max-width:380px;}
+  .pstep{font-size:9px;font-family:'Share Tech Mono',monospace;color:var(--text-dim);
+    letter-spacing:.5px;display:flex;align-items:center;gap:5px;opacity:0;transition:opacity .3s;}
+  .pstep.active{opacity:1;color:var(--gold);}
+  .pstep.done{opacity:.6;color:var(--green);}
+  .step-dot{width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0;}
+
+  /* LOG */
+  .log-panel{background:var(--bg2);border:1px solid var(--border);border-radius:9px;
+    padding:10px;margin-bottom:10px;max-height:140px;overflow-y:auto;display:none;}
+  .log-panel::-webkit-scrollbar{width:3px;}
+  .log-panel::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+  .log-line{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);
+    padding:1px 0;border-bottom:1px solid rgba(255,255,255,.03);line-height:1.6;}
+  .log-line.bull{color:var(--green);}
+  .log-line.bear{color:var(--red);}
+  .log-line.warn{color:var(--gold);}
+
+  .footer{text-align:center;font-family:'Share Tech Mono',monospace;font-size:9px;
+    color:var(--text-dim);letter-spacing:1px;margin-top:6px;padding-top:12px;border-top:1px solid var(--border);}
+  ::-webkit-scrollbar{width:4px;}
+  ::-webkit-scrollbar-track{background:var(--bg);}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+
+  /* в”Ђв”Ђ PAIR SELECTOR в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+  .ps-wrap{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .ps-title{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:8px}
+  .ps-active{font-family:'Orbitron',monospace;font-size:16px;font-weight:700;color:var(--gold);
+    background:rgba(255,215,0,.06);border:1px solid rgba(255,215,0,.2);border-radius:8px;
+    padding:9px 14px;cursor:pointer;width:100%;text-align:left;letter-spacing:2px;
+    display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;transition:all .2s}
+  .ps-active:hover{border-color:var(--gold);background:rgba(255,215,0,.1)}
+  .ps-arrow{font-size:10px;color:var(--gold-dim)}
+  .ps-list{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;max-height:190px;overflow-y:auto}
+  .ps-list::-webkit-scrollbar{width:3px}.ps-list::-webkit-scrollbar-thumb{background:var(--border)}
+  .ps-btn{font-family:'Orbitron',monospace;font-size:9px;font-weight:700;color:var(--text-dim);
+    background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:5px;
+    padding:6px 4px;cursor:pointer;text-align:center;transition:all .15s;letter-spacing:.5px}
+  .ps-btn:hover{border-color:rgba(255,215,0,.3);color:var(--gold)}
+  .ps-btn.sel{border-color:var(--gold);color:var(--gold);background:rgba(255,215,0,.08)}
+  /* в”Ђв”Ђ SCANNER PANEL в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+  .sc-wrap{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:10px}
+  .sc-hdr{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--gold-dim);letter-spacing:2px;margin-bottom:8px;display:flex;justify-content:space-between}
+  .sc-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .sc-item{background:var(--bg2);border:1px solid var(--border);border-radius:6px;padding:7px 9px;cursor:pointer;transition:all .2s}
+  .sc-item:hover{border-color:rgba(255,215,0,.2)}
+  .sc-item.near-b{border-color:rgba(0,255,170,.35);background:rgba(0,255,170,.04)}
+  .sc-item.near-s{border-color:rgba(255,51,85,.35);background:rgba(255,51,85,.04)}
+  .sc-pair{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:var(--text);letter-spacing:1px}
+  .sc-stat{font-family:'Share Tech Mono',monospace;font-size:8px;margin-top:2px}
+  .sc-stat.b{color:var(--green)}.sc-stat.r{color:var(--red)}.sc-stat.n{color:var(--text-dim)}
+  /* в”Ђв”Ђ CLOSE ALERT в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ */
+  .cl-alert{display:none;background:rgba(255,51,85,.08);border:2px solid rgba(255,51,85,.45);
+    border-radius:12px;padding:14px 16px;margin-bottom:10px;text-align:center}
+  .cl-alert.show{display:block;animation:clPulse 1.4s ease-in-out infinite alternate}
+  @keyframes clPulse{from{box-shadow:0 0 8px rgba(255,51,85,.1)}to{box-shadow:0 0 35px rgba(255,51,85,.35)}}
+  .cl-main{font-family:'Orbitron',monospace;font-size:20px;font-weight:900;color:#ff3355;letter-spacing:3px}
+  .cl-sub{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--text-dim);margin-top:5px;letter-spacing:1px}
+  .cl-ok{margin-top:8px;background:rgba(255,51,85,.1);border:1px solid rgba(255,51,85,.25);
+    color:#ff3355;padding:5px 14px;border-radius:5px;cursor:pointer;
+    font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px}
+
+  @media(max-width:480px){.bot-name{font-size:24px}.price-main{font-size:30px}.signal-badge{font-size:24px}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-line">
+      <div class="header-icon">вљЎ</div>
+      <div class="bot-name">AI SMART</div>
+    </div>
+    <div class="version-tag">РњРЈР›Р¬РўР-РџРђР Рђ В· 6 РРќР”РРљРђРўРћР РћР’ В· LIQ+SMC В· V6.0</div>
+  </div>
+
+
+  <!-- CLOSE ALERT -->
+  <div class="cl-alert" id="clAlert">
+    <div class="cl-main">вљ  SГ–WDANY ГќAP!</div>
+    <div class="cl-sub" id="clAlertSub">Indiki razgon zonasyna golaГЅlaЕџГЅar</div>
+    <button class="cl-ok" onclick="dismissCloseAlert()">вњ“ DГњЕћГњNDIM вЂ” ГќAPDYM</button>
+  </div>
+
+  <!-- PAIR SELECTOR -->
+  <div class="ps-wrap">
+    <div class="ps-title">РђРљРўРР’РќРђРЇ РџРђР Рђ</div>
+    <button class="ps-active" id="psActiveBtn" onclick="togglePairList()">
+      <span id="psLabel">XAU/USD</span>
+      <span class="ps-arrow" id="psArrow">в–ј</span>
+    </button>
+    <div class="ps-list" id="psList" style="display:none">
+      <button class="ps-btn  sel" onclick="selPair(this,'XAU/USD')">XAU/USD</button>
+      <button class="ps-btn" onclick="selPair(this,'EUR/USD')">EUR/USD</button>
+      <button class="ps-btn" onclick="selPair(this,'GBP/USD')">GBP/USD</button>
+      <button class="ps-btn" onclick="selPair(this,'GBP/JPY')">GBP/JPY</button>
+      <button class="ps-btn" onclick="selPair(this,'USD/JPY')">USD/JPY</button>
+      <button class="ps-btn" onclick="selPair(this,'EUR/JPY')">EUR/JPY</button>
+      <button class="ps-btn" onclick="selPair(this,'AUD/USD')">AUD/USD</button>
+      <button class="ps-btn" onclick="selPair(this,'NZD/USD')">NZD/USD</button>
+      <button class="ps-btn" onclick="selPair(this,'USD/CAD')">USD/CAD</button>
+      <button class="ps-btn" onclick="selPair(this,'USD/CHF')">USD/CHF</button>
+      <button class="ps-btn" onclick="selPair(this,'EUR/GBP')">EUR/GBP</button>
+      <button class="ps-btn" onclick="selPair(this,'EUR/CAD')">EUR/CAD</button>
+      <button class="ps-btn" onclick="selPair(this,'EUR/AUD')">EUR/AUD</button>
+      <button class="ps-btn" onclick="selPair(this,'EUR/CHF')">EUR/CHF</button>
+      <button class="ps-btn" onclick="selPair(this,'GBP/AUD')">GBP/AUD</button>
+      <button class="ps-btn" onclick="selPair(this,'GBP/CAD')">GBP/CAD</button>
+      <button class="ps-btn" onclick="selPair(this,'GBP/CHF')">GBP/CHF</button>
+      <button class="ps-btn" onclick="selPair(this,'AUD/JPY')">AUD/JPY</button>
+      <button class="ps-btn" onclick="selPair(this,'AUD/CAD')">AUD/CAD</button>
+      <button class="ps-btn" onclick="selPair(this,'AUD/CHF')">AUD/CHF</button>
+      <button class="ps-btn" onclick="selPair(this,'AUD/NZD')">AUD/NZD</button>
+      <button class="ps-btn" onclick="selPair(this,'CAD/JPY')">CAD/JPY</button>
+      <button class="ps-btn" onclick="selPair(this,'CAD/CHF')">CAD/CHF</button>
+      <button class="ps-btn" onclick="selPair(this,'CHF/
