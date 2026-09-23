@@ -1,15 +1,30 @@
-name: XAUUSD Signal Bot
+name: RSI MACD Signal Bot
+
 on:
   schedule:
-    - cron: '*/5 * * * *'
+    - cron: "*/5 * * * *"
   workflow_dispatch:
+
 jobs:
   run-bot:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-      - run: pip install requests
-      - run: timeout 250 python bot.py || true
+          python-version: "3.12"
+
+      - name: Install requests
+        run: pip install requests
+
+      - name: Run signal bot
+        run: timeout 250 python 2bot.py || true
